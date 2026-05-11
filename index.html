@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lịch Sử">
+<meta name="theme-color" content="#c9a84c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Lịch Sử Việt Nam</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  [data-theme="dark"] {
+    --bg:#1a0e05; --card-bg:linear-gradient(145deg,#2d1b0e,#1a0e05); --card-border:#c9a84c;
+    --gold:#c9a84c; --dark-gold:#8b6914; --text:#f5e6c8; --text-sub:#b0906a; --text-muted:#8b6914;
+    --option-bg:rgba(201,168,76,0.05); --option-border:rgba(201,168,76,0.25); --option-color:#d4b896;
+    --info-bg:rgba(201,168,76,0.08); --info-border:rgba(201,168,76,0.3); --info-text:#c8a97a;
+    --progress-bg:rgba(201,168,76,0.2); --result-bg:rgba(201,168,76,0.06); --result-border:rgba(201,168,76,0.2);
+    --shadow:0 0 60px rgba(201,168,76,0.2); --correct-text:#a8f0c0; --wrong-text:#f0a8a0;
+    --correct-fb-text:#a8f0c0; --wrong-fb-text:#f0a8a0;
+  }
+  [data-theme="light"] {
+    --bg:#fdf6e3; --card-bg:linear-gradient(145deg,#ffffff,#fef9f0); --card-border:#c9a84c;
+    --gold:#8b6914; --dark-gold:#6b5010; --text:#2d1b0e; --text-sub:#7a5c2e; --text-muted:#a07840;
+    --option-bg:rgba(139,105,20,0.04); --option-border:rgba(139,105,20,0.2); --option-color:#4a3010;
+    --info-bg:rgba(139,105,20,0.06); --info-border:rgba(139,105,20,0.2); --info-text:#6b4c1e;
+    --progress-bg:rgba(139,105,20,0.15); --result-bg:rgba(139,105,20,0.04); --result-border:rgba(139,105,20,0.15);
+    --shadow:0 4px 30px rgba(139,105,20,0.15); --correct-text:#1a6b3a; --wrong-text:#8b1a1a;
+    --correct-fb-text:#1a5c30; --wrong-fb-text:#7a1010;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow-x:hidden;transition:background 0.4s;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(201,168,76,0.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(192,57,43,0.08) 0%,transparent 50%);pointer-events:none;}
+  .container{width:100%;max-width:520px;position:relative;z-index:1;}
+
+  .theme-toggle{position:absolute;top:12px;right:14px;background:var(--info-bg);border:1.5px solid var(--card-border);border-radius:20px;padding:5px 10px;cursor:pointer;font-size:18px;transition:all 0.3s;z-index:10;line-height:1;}
+
+  .card{background:var(--card-bg);border:2px solid var(--card-border);border-radius:6px;padding:32px 24px;box-shadow:var(--shadow);position:relative;transition:all 0.4s;}
+  .card::before{content:'❖';position:absolute;top:10px;left:14px;color:var(--gold);font-size:16px;opacity:0.5;}
+  .card::after{content:'❖';position:absolute;bottom:10px;right:14px;color:var(--gold);font-size:16px;opacity:0.5;}
+
+  .screen{display:none;} .screen.active{display:block;animation:fadeIn 0.3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .install-banner{display:none;background:var(--info-bg);border:1px solid var(--info-border);border-radius:6px;padding:12px 16px;margin-bottom:20px;align-items:center;gap:10px;}
+  .install-banner.show{display:flex;}
+  .install-banner p{color:var(--info-text);font-size:13px;flex:1;line-height:1.4;}
+  .install-btn-small{background:var(--gold);color:white;border:none;border-radius:4px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+  .title-deco{text-align:center;color:var(--gold);font-size:12px;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;opacity:0.7;}
+  h1{font-family:'Crimson Pro',serif;font-size:38px;color:var(--gold);text-align:center;line-height:1.1;margin-bottom:4px;transition:color 0.4s;}
+  .subtitle{text-align:center;color:var(--text-sub);font-size:13px;margin-bottom:28px;letter-spacing:1px;transition:color 0.4s;}
+  .divider{display:flex;align-items:center;gap:10px;margin:20px 0;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);}
+  .divider span{color:var(--gold);font-size:14px;}
+  .info-box{background:var(--info-bg);border:1px solid var(--info-border);border-radius:4px;padding:14px 18px;margin-bottom:24px;transition:all 0.4s;}
+  .info-box p{color:var(--info-text);font-size:13px;line-height:1.9;transition:color 0.4s;}
+  .info-box p span{color:var(--gold);font-weight:600;}
+
+  .btn{display:block;width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),var(--dark-gold));color:white;border:none;border-radius:4px;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,168,76,0.3);}
+  .btn:active{transform:scale(0.98);}
+  .btn.secondary{background:transparent;border:1px solid var(--gold);color:var(--gold);margin-top:10px;font-size:13px;padding:11px;}
+
+  .progress-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .progress-bar{flex:1;height:4px;background:var(--progress-bg);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(to right,var(--gold),#f0c060);border-radius:2px;transition:width 0.5s ease;}
+  .progress-text{color:var(--gold);font-size:12px;font-weight:600;white-space:nowrap;}
+  .score-badge{display:flex;align-items:center;gap:6px;color:var(--gold);font-size:13px;font-weight:600;margin-bottom:16px;}
+  .question-num{color:var(--text-muted);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+  .question-text{font-family:'Crimson Pro',serif;font-size:20px;color:var(--text);line-height:1.5;margin-bottom:22px;min-height:70px;transition:color 0.4s;}
+
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+  .option{background:var(--option-bg);border:1px solid var(--option-border);border-radius:4px;padding:13px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;color:var(--option-color);font-size:14px;text-align:left;}
+  .option:active:not(.disabled){transform:scale(0.98);}
+  .option-letter{width:26px;height:26px;border-radius:50%;background:var(--option-bg);border:1px solid var(--option-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;transition:all 0.2s;}
+  .option.correct{background:rgba(39,174,96,0.15);border-color:#27ae60;color:var(--correct-text);}
+  .option.correct .option-letter{background:#27ae60;border-color:#27ae60;color:white;}
+  .option.wrong{background:rgba(192,57,43,0.12);border-color:#c0392b;color:var(--wrong-text);}
+  .option.wrong .option-letter{background:#c0392b;border-color:#c0392b;color:white;}
+  .option.disabled{cursor:default;}
+
+  .feedback{min-height:48px;padding:11px 14px;border-radius:4px;font-size:13px;line-height:1.5;margin-bottom:16px;display:none;}
+  .feedback.show{display:block;}
+  .feedback.correct-fb{background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.3);color:var(--correct-fb-text);}
+  .feedback.wrong-fb{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);color:var(--wrong-fb-text);}
+
+  .score-circle{width:130px;height:130px;border-radius:50%;border:3px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:16px auto;background:radial-gradient(circle,var(--info-bg),transparent);box-shadow:var(--shadow);}
+  .score-number{font-family:'Crimson Pro',serif;font-size:48px;color:var(--gold);line-height:1;}
+  .score-total{color:var(--text-muted);font-size:12px;}
+  .rank-text{font-family:'Crimson Pro',serif;font-size:24px;color:var(--text);text-align:center;margin-bottom:6px;transition:color 0.4s;}
+  .rank-sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:20px;transition:color 0.4s;}
+  .result-detail{background:var(--result-bg);border:1px solid var(--result-border);border-radius:4px;padding:14px 18px;margin-bottom:20px;transition:all 0.4s;}
+  .result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--result-border);color:var(--info-text);font-size:13px;}
+  .result-row:last-child{border-bottom:none;}
+  .result-row span:last-child{color:var(--gold);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙</button>
+
+    <div class="install-banner" id="install-banner">
+      <p>📲 Cài app lên màn hình chính để dùng offline!</p>
+      <button class="install-btn-small" onclick="installApp()">Cài App</button>
+    </div>
+
+    <div class="screen active" id="screen-start">
+      <div class="title-deco">✦ Trắc Nghiệm ✦</div>
+      <h1>Lịch Sử<br>Việt Nam</h1>
+      <p class="subtitle">Cấp 2 · THCS</p>
+      <div class="divider"><span>❖</span></div>
+      <div class="info-box">
+        <p>📜 <span>10 câu hỏi</span> lịch sử Việt Nam thời trung đại</p>
+        <p>🏆 Mỗi câu đúng được <span>10 điểm</span></p>
+        <p>💡 Có giải thích sau mỗi câu</p>
+        <p>📱 Hoạt động offline sau khi cài</p>
+      </div>
+      <button class="btn" onclick="startGame()">⚔️ &nbsp; BẮT ĐẦU THI</button>
+    </div>
+
+    <div class="screen" id="screen-quiz">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="progress-text" id="progress-text">1 / 10</div>
+      </div>
+      <div class="score-badge">🏆 Điểm: <span id="current-score">0</span></div>
+      <div class="question-num" id="question-num">Câu 1</div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none">Câu tiếp theo →</button>
+    </div>
+
+    <div class="screen" id="screen-result">
+      <div class="title-deco">✦ Kết Quả ✦</div>
+      <div class="score-circle">
+        <div class="score-number" id="final-score">0</div>
+        <div class="score-total">/ 100 điểm</div>
+      </div>
+      <div class="rank-text" id="rank-text"></div>
+      <div class="rank-sub" id="rank-sub"></div>
+      <div class="result-detail">
+        <div class="result-row"><span>✅ Số câu đúng</span><span id="correct-count">0/10</span></div>
+        <div class="result-row"><span>❌ Số câu sai</span><span id="wrong-count">0</span></div>
+        <div class="result-row"><span>🏆 Điểm số</span><span id="final-score-2">0/100</span></div>
+      </div>
+      <button class="btn" onclick="startGame()">🔄 &nbsp; THI LẠI</button>
+      <button class="btn secondary" onclick="showScreen('screen-start')">← Về trang chủ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').classList.add('show');});
+function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('install-banner').classList.remove('show');});}}
+window.addEventListener('appinstalled',()=>document.getElementById('install-banner').classList.remove('show'));
+
+// THEME
+const savedTheme = localStorage.getItem('theme')||'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('theme-btn').textContent = savedTheme==='light'?'🌙':'☀️';
+
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  const newTheme=isDark?'light':'dark';
+  html.setAttribute('data-theme',newTheme);
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';
+  localStorage.setItem('theme',newTheme);
+}
+
+const questions=[
+  {q:"Nhà Trần được thành lập vào năm nào?",options:["A. 1226","B. 1225","C. 1228","D. 1230"],answer:0,explain:"Nhà Trần thành lập năm 1226, sau khi Trần Cảnh lên ngôi, kết thúc triều đại nhà Lý."},
+  {q:"Trong kháng chiến chống quân Mông – Nguyên lần thứ nhất (1258), ai là người chỉ huy quân dân Đại Việt?",options:["A. Trần Hưng Đạo","B. Trần Thái Tông","C. Trần Nhân Tông","D. Trần Quang Khải"],answer:1,explain:"Trong cuộc kháng chiến lần 1 năm 1258, vua Trần Thái Tông trực tiếp chỉ huy quân dân đánh giặc."},
+  {q:"Câu nói 'Đầu thần chưa rơi xuống đất, xin bệ hạ đừng lo' là của ai?",options:["A. Trần Quang Khải","B. Trần Bình Trọng","C. Trần Thủ Độ","D. Trần Hưng Đạo"],answer:2,explain:"Câu nói này của Thái sư Trần Thủ Độ, thể hiện quyết tâm kháng chiến chống quân Mông Cổ."},
+  {q:"Chiến thắng Bạch Đằng năm 1288 gắn liền với tên tuổi của vị tướng nào?",options:["A. Lê Lợi","B. Nguyễn Trãi","C. Trần Hưng Đạo","D. Đinh Bộ Lĩnh"],answer:2,explain:"Trận Bạch Đằng 1288 do Hưng Đạo Vương Trần Quốc Tuấn chỉ huy, đánh tan hoàn toàn quân Mông – Nguyên."},
+  {q:"Nhà Hồ được thành lập năm nào?",options:["A. 1396","B. 1397","C. 1400","D. 1407"],answer:2,explain:"Hồ Quý Ly lập ra nhà Hồ năm 1400, đặt tên nước là Đại Ngu."},
+  {q:"Khởi nghĩa Lam Sơn do ai lãnh đạo?",options:["A. Nguyễn Trãi","B. Lê Lợi","C. Lê Lai","D. Đinh Lễ"],answer:1,explain:"Lê Lợi là lãnh tụ tối cao của cuộc khởi nghĩa Lam Sơn (1418–1427), sau lên ngôi lập ra nhà Lê."},
+  {q:"Trận Tốt Động – Chúc Động (1426) diễn ra ở vùng nào?",options:["A. Nghệ An","B. Thanh Hóa","C. Hà Tây (nay là Hà Nội)","D. Ninh Bình"],answer:2,explain:"Trận Tốt Động – Chúc Động diễn ra ở vùng Hà Tây, nghĩa quân Lam Sơn đại thắng quân Minh."},
+  {q:"Nước Đại Việt thời Lê sơ đóng đô ở đâu?",options:["A. Phú Xuân","B. Thăng Long","C. Hoa Lư","D. Thanh Hóa"],answer:1,explain:"Nhà Lê sơ đóng đô tại Thăng Long (nay là Hà Nội), giữ tên kinh đô từ thời Lý – Trần."},
+  {q:"Bộ luật Hồng Đức được ban hành dưới triều vua nào của nhà Lê?",options:["A. Lê Thái Tổ","B. Lê Thái Tông","C. Lê Thánh Tông","D. Lê Nhân Tông"],answer:2,explain:"Bộ luật Hồng Đức được vua Lê Thánh Tông ban hành, là bộ luật tiến bộ nhất thời phong kiến Việt Nam."},
+  {q:"Sau khi đánh thắng quân Minh, Lê Lợi lên ngôi vua vào năm nào?",options:["A. 1426","B. 1427","C. 1428","D. 1430"],answer:2,explain:"Năm 1428, sau khi quân Minh rút về nước, Lê Lợi lên ngôi hoàng đế, lập ra nhà Lê sơ."}
+];
+
+let currentQ=0,score=0,correctCount=0,answered=false;
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function startGame(){currentQ=0;score=0;correctCount=0;showScreen('screen-quiz');loadQuestion();}
+function loadQuestion(){
+  answered=false;
+  const q=questions[currentQ];
+  document.getElementById('progress-fill').style.width=((currentQ/questions.length)*100)+'%';
+  document.getElementById('progress-text').textContent=(currentQ+1)+' / '+questions.length;
+  document.getElementById('question-num').textContent='Câu '+(currentQ+1);
+  document.getElementById('question-text').textContent=q.q;
+  document.getElementById('current-score').textContent=score;
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('next-btn').style.display='none';
+  const letters=['A','B','C','D'];
+  const optionsEl=document.getElementById('options');
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option';
+    btn.innerHTML=`<span class="option-letter">${letters[i]}</span>${opt.substring(3)}`;
+    btn.onclick=()=>selectAnswer(i);
+    optionsEl.appendChild(btn);
+  });
+}
+function selectAnswer(index){
+  if(answered)return;answered=true;
+  const q=questions[currentQ];
+  const options=document.querySelectorAll('.option');
+  const feedback=document.getElementById('feedback');
+  options.forEach(o=>o.classList.add('disabled'));
+  options[q.answer].classList.add('correct');
+  if(index===q.answer){score+=10;correctCount++;document.getElementById('current-score').textContent=score;feedback.className='feedback correct-fb show';feedback.innerHTML='✅ <strong>Chính xác!</strong> '+q.explain;}
+  else{options[index].classList.add('wrong');feedback.className='feedback wrong-fb show';feedback.innerHTML='❌ <strong>Sai rồi!</strong> '+q.explain;}
+  const nextBtn=document.getElementById('next-btn');
+  nextBtn.style.display='block';
+  nextBtn.textContent=currentQ===questions.length-1?'🏆  Xem kết quả':'Câu tiếp theo →';
+}
+function nextQuestion(){currentQ++;if(currentQ>=questions.length)showResult();else loadQuestion();}
+function showResult(){
+  showScreen('screen-result');
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('final-score-2').textContent=score+'/100';
+  document.getElementById('correct-count').textContent=correctCount+'/10';
+  document.getElementById('wrong-count').textContent=(10-correctCount);
+  let rank,sub;
+  if(score===100){rank='🏆 Xuất Sắc!';sub='Bạn thật sự là nhà sử học nhí!';}
+  else if(score>=80){rank='⭐ Giỏi!';sub='Kiến thức lịch sử rất vững!';}
+  else if(score>=60){rank='👍 Khá!';sub='Ôn thêm một chút nữa là giỏi thôi!';}
+  else if(score>=40){rank='📚 Trung Bình';sub='Cần ôn tập thêm bạn nhé!';}
+  else{rank='💪 Cố Lên!';sub='Đọc lại bài và thử lại nhé!';}
+  document.getElementById('rank-text').textContent=rank;
+  document.getElementById('rank-sub').textContent=sub;
+}
+</script>
+</body>
+</html>
